@@ -1,4 +1,4 @@
-# $FreeBSD$
+# $FreeBSD: head/Mk/Uses/linux.mk 533773 2020-05-03 12:50:42Z tijl $
 #
 # Ports Linux compatibility framework
 #
@@ -40,8 +40,8 @@ IGNORE=			Invalid Linux distribution: ${linux_ARGS}
 .endif
 
 .ifndef ONLY_FOR_ARCHS
-ONLY_FOR_ARCHS=		amd64 i386
-ONLY_FOR_ARCHS_REASON=	Linux compatibility is only available on amd64 and i386
+ONLY_FOR_ARCHS=		aarch64 amd64 i386
+ONLY_FOR_ARCHS_REASON=	Linux compatibility is only available on aarch64, amd64 and i386
 .endif
 
 _linux_c7_alsa-lib-devel=		linux-c7-alsa-lib-devel>0:audio/linux-c7-alsa-lib-devel
@@ -157,7 +157,9 @@ DEV_ERROR+=		"USE_LINUX=${i}: package does not exist"
 .if ${linux_ARGS} == c7
 .ifndef MASTER_SITES
 MASTER_SITES=		${MASTER_SITE_CENTOS_LINUX}
-MASTER_SITE_SUBDIR=	centos/${LINUX_DIST_VER}/os/x86_64/Packages/:DEFAULT,amd64 \
+MASTER_SITE_SUBDIR=	altarch/${LINUX_DIST_VER}/os/aarch64/Packages/:DEFAULT,aarch64 \
+			altarch/${LINUX_DIST_VER}/updates/aarch64/Packages/:DEFAULT,aarch64 \
+			centos/${LINUX_DIST_VER}/os/x86_64/Packages/:DEFAULT,amd64 \
 			centos/${LINUX_DIST_VER}/updates/x86_64/Packages/:DEFAULT,amd64 \
 			altarch/${LINUX_DIST_VER}/os/i386/Packages/:DEFAULT,i386 \
 			altarch/${LINUX_DIST_VER}/updates/i386/Packages/:DEFAULT,i386 \
@@ -169,6 +171,7 @@ DIST_SUBDIR?=		centos
 
 PKGNAMEPREFIX?=		linux-${linux_ARGS}-
 EXTRACT_SUFX?=		.rpm
+EXTRACT_SUFX_aarch64?=	.aarch64${EXTRACT_SUFX}
 EXTRACT_SUFX_amd64?=	.x86_64${EXTRACT_SUFX}
 EXTRACT_SUFX_i386?=	.i686${EXTRACT_SUFX}
 EXTRACT_SUFX_noarch?=	.noarch${EXTRACT_SUFX}
@@ -194,6 +197,13 @@ SHARE_DISTNAMES?=	${DISTNAME}
 BIN_DISTNAMES?=		${DISTNAME}
 .else
 LIB_DISTNAMES?=		${DISTNAME}
+.endif
+.if !(defined(ONLY_FOR_ARCHS) && empty(ONLY_FOR_ARCHS:Maarch64)) \
+ && empty(NOT_FOR_ARCHS:Maarch64)
+DISTFILES_aarch64?=	${LIB_DISTNAMES:S/$/${EXTRACT_SUFX_aarch64}:aarch64/} \
+			${BIN_DISTNAMES:S/$/${EXTRACT_SUFX_aarch64}:aarch64/} \
+			${SHARE_DISTNAMES:S/$/${EXTRACT_SUFX_noarch}/} \
+			${LIB_DISTNAMES_aarch64:S/$/${EXTRACT_SUFX_aarch64}:aarch64/}
 .endif
 .if !(defined(ONLY_FOR_ARCHS) && empty(ONLY_FOR_ARCHS:Mamd64)) \
  && empty(NOT_FOR_ARCHS:Mamd64)
@@ -246,6 +256,14 @@ do-install:
 
 .endif # USE_LINUX_RPM
 
+##	${LIB_DISTNAMES:S/compat-libstdc++-33-3.2.3-72.el7//} \
+##	${LIB_DISTNAMES:S/redhat-lsb-core-4.1-27.el7.centos.1/redhat-lsb-core-4.1-27.el7.1/}
+#compat-libstdc++-33-3.2.3-72.el7
+#redhat-lsb-core-4.1-27.el7.centos.1
+
+.ifdef DISTNAME_aarch64
+DISTFILES_aarch64?=	${DISTNAME_aarch64}${EXTRACT_SUFX}
+.endif
 .ifdef DISTNAME_amd64
 DISTFILES_amd64?=	${DISTNAME_amd64}${EXTRACT_SUFX}
 .endif
@@ -253,9 +271,9 @@ DISTFILES_amd64?=	${DISTNAME_amd64}${EXTRACT_SUFX}
 DISTFILES_i386?=	${DISTNAME_i386}${EXTRACT_SUFX}
 .endif
 .ifndef DISTFILES
-.ifdef DISTFILES_amd64 || DISTFILES_i386
+.ifdef DISTFILES_aarch64 || DISTFILES_amd64 || DISTFILES_i386
 .if make(makesum)
-_ALL_DISTFILES=		${DISTFILES_amd64} ${DISTFILES_i386}
+_ALL_DISTFILES=		${DISTFILES_aarch64} ${DISTFILES_amd64} ${DISTFILES_i386}
 DISTFILES=		${_ALL_DISTFILES:O:u}
 .else
 DISTFILES=		${DISTFILES_${ARCH}}

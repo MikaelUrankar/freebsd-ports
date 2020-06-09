@@ -1,4 +1,6 @@
-TIMESTAMP = 1589568782
+TIMESTAMP = 1591714101
+SHA256 (centos/systemd-libs-219-73.el7_8.6.aarch64.rpm) = ea8ff7a9c30f8cf444219746cb929b80e6abebe4e028976a929ef9851377053e
+SIZE (centos/systemd-libs-219-73.el7_8.6.aarch64.rpm) = 402068
 SHA256 (centos/systemd-libs-219-73.el7_8.6.i686.rpm) = 2c3b397aad4571d2a23130b88335924debfa73ef981401c81302ccd4ef64d3dc
 SIZE (centos/systemd-libs-219-73.el7_8.6.i686.rpm) = 432492
 SHA256 (centos/systemd-libs-219-73.el7_8.6.x86_64.rpm) = 41bdc210b5a9bd672c779c9a96252089a130d7ed88b130f739a79a7ce1318c9d

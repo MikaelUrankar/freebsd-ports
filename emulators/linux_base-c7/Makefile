@@ -1,4 +1,4 @@
-# $FreeBSD$
+# $FreeBSD: head/emulators/linux_base-c7/Makefile 534102 2020-05-05 18:31:55Z tijl $
 
 PORTNAME=	c7
 PORTVERSION=	${LINUX_DIST_VER}
@@ -34,7 +34,6 @@ BIN_DISTNAMES=	bash-4.2.46-34.el7 \
 		which-2.20-7.el7
 LIB_DISTNAMES=	bzip2-libs-1.0.6-13.el7 \
 		compat-db47-4.7.25-28.el7 \
-		compat-libstdc++-33-3.2.3-72.el7 \
 		e2fsprogs-libs-1.42.9-17.el7 \
 		gamin-0.1.10-16.el7 \
 		gdbm-1.10-8.el7 \
@@ -63,7 +62,6 @@ LIB_DISTNAMES=	bzip2-libs-1.0.6-13.el7 \
 		pcre-8.32-17.el7 \
 		popt-1.13-16.el7 \
 		readline-6.2-11.el7 \
-		redhat-lsb-core-4.1-27.el7.centos.1 \
 		slang-2.2.4-11.el7 \
 		util-linux-2.23.2-63.el7 \
 		xz-libs-5.2.2-1.el7 \
@@ -118,6 +116,18 @@ SRC_DISTFILES=	acl-2.2.51-15.el7${SRC_SUFX}:SOURCE \
 		xz-5.2.2-1.el7${SRC_SUFX}:SOURCE \
 		zlib-1.2.7-18.el7${SRC_SUFX}:SOURCE
 
+#MA?=    redhat-lsb-core-4.1-27.el7.centos.1 \
+#	compat-libstdc++-33-3.2.3-72.el7
+#
+##MB=     ${MA:S/compat-libstdc++-33-3.2.3-72.el7//:S/redhat-lsb-core-4.1-27.el7.centos.1/redhat-lsb-core-4.1-27.el7.1/}
+#MB=     ${MA:C/compat-libstdc.*//}
+
+LIB_DISTNAMES_aarch64=	redhat-lsb-core-4.1-27.el7.1
+LIB_DISTNAMES_amd64=	compat-libstdc++-33-3.2.3-72.el7 \
+			redhat-lsb-core-4.1-27.el7.centos.1
+LIB_DISTNAMES_i386=	${LIB_DISTNAMES_amd64}
+#LIB_DISTNAMES+=	${LIB_DISTNAMES_${ARCH}}
+
 PLIST_SUB=	LINUXBASE=${LINUXBASE} SYSCTLMIB=${SYSCTLMIB}
 
 OPTIONS_DEFINE=	DOCS NLS
@@ -136,7 +146,9 @@ REMOVE_FILES=	bin/chfn bin/chsh bin/findmnt bin/login bin/lsblk bin/lscpu \
 
 .if ${OPSYS} == FreeBSD && ${OSVERSION} < 1300077
 GLIBC_VER=	2.17-292.el7
-MASTER_SITE_SUBDIR+=	centos/7.7.1908/os/x86_64/Packages/:DEFAULT,amd64 \
+MASTER_SITE_SUBDIR+=	altarch/7.7.1908/os/aarch64/Packages/:DEFAULT,aarch64 \
+			altarch/7.7.1908/updates/aarch64/Packages/:DEFAULT,aarch64 \
+			centos/7.7.1908/os/x86_64/Packages/:DEFAULT,amd64 \
 			centos/7.7.1908/updates/x86_64/Packages/:DEFAULT,amd64 \
 			altarch/7.7.1908/os/i386/Packages/:DEFAULT,i386 \
 			altarch/7.7.1908/updates/i386/Packages/:DEFAULT,i386 \
@@ -167,7 +179,7 @@ post-extract:
 		${EXTRACT_AFTER_ARGS})
 .if ${ARCH} == i386
 	@${CHMOD} u+w ${WRKSRC}/usr/lib/pm-utils
-.elif ${ARCH} == amd64
+.elif ${ARCH} == aarch64 || ${ARCH} == amd64
 	@${CHMOD} u+w ${WRKSRC}/usr/lib64/pm-utils
 .endif
 
@@ -175,8 +187,10 @@ post-patch:
 	@${RM} -r ${REMOVE_DIRS:S|^|${WRKSRC}/|}
 	@${RM} ${REMOVE_FILES:S|^|${WRKSRC}/|}
 	@${FIND} ${WRKSRC}/usr -type d -empty -not -path '*/lib*/gio/*' -delete
+.if ${ARCH} != aarch64
 	@${BRANDELF} -t Linux ${WRKSRC}/usr/lib/ld-2.17.so
-.if ${ARCH} == amd64
+.endif
+.if ${ARCH} == aarch64 || ${ARCH} == amd64
 	@${BRANDELF} -t Linux ${WRKSRC}/usr/lib64/ld-2.17.so
 .endif
 

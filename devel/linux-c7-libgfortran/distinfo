@@ -1,4 +1,6 @@
-TIMESTAMP = 1568991015
+TIMESTAMP = 1591714093
+SHA256 (centos/libgfortran-4.8.5-39.el7.aarch64.rpm) = 81929e4b85d235f872fb1bf772ae7b8c537515f339132b2dd5b53ee9fb53cb10
+SIZE (centos/libgfortran-4.8.5-39.el7.aarch64.rpm) = 257652
 SHA256 (centos/libgfortran-4.8.5-39.el7.i686.rpm) = 6fc3ed22fd6de9c93831d5a1ed144c750692e2f165c77ebffc077560986e1718
 SIZE (centos/libgfortran-4.8.5-39.el7.i686.rpm) = 294020
 SHA256 (centos/libgfortran-4.8.5-39.el7.x86_64.rpm) = a23ec7c80ce33782914cab30c7a3d9481de60f995a9bf412d76c841dbf1a8675
